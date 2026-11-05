@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>امن‌شهر | آموزش مدیریت بحران و پدافند غیرعامل</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans: ['Vazirmatn','Tahoma','sans-serif'] },
+  colors: {
+    navy: { 50:'#EEF4FA', 100:'#D5E4F3', 600:'#1C5C94', 700:'#0B4F8A', 800:'#0B3D68', 900:'#082C4A' },
+    safe: { 50:'#E8F5EE', 100:'#C7E8D5', 600:'#00843D', 700:'#007A4D', 800:'#00643B' },
+    fire: { 50:'#FDECEE', 600:'#C8102E', 700:'#A50D26' },
+    warn: { 100:'#FFF1C2', 400:'#FFB81C', 500:'#E6A000' }
+  } } } };
+</script>
+<style>
+  body { font-family:'Vazirmatn',Tahoma,sans-serif; background:#F5F7FA; color:#1A1A1A; }
+  :focus-visible { outline:3px solid #FFB81C; outline-offset:2px; }
+  .card { background:#fff; border:1px solid #DDE3EA; border-radius:.75rem; transition:box-shadow .2s, transform .2s; }
+  .card:hover { box-shadow:0 6px 20px rgba(11,79,138,.12); transform:translateY(-2px); }
+  .chip { border:1px solid #C3CCD6; border-radius:999px; padding:.4rem .9rem; font-size:.875rem; font-weight:700; background:#fff; }
+  .chip[aria-pressed="true"] { background:#0B4F8A; color:#fff; border-color:#0B4F8A; }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; scroll-behavior:auto !important; } }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<div class="bg-fire-600 text-white text-sm">
+  <div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap gap-x-6 gap-y-1 justify-between">
+    <span class="font-bold">در شرایط اضطراری:</span>
+    <span>اورژانس ۱۱۵</span><span>آتش‌نشانی ۱۲۵</span><span>پلیس ۱۱۰</span>
+  </div>
+</div>
+
+<header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <a href="#home" class="flex items-center gap-3 font-extrabold text-navy-800">
+      <span class="w-10 h-10 rounded-lg bg-safe-700 text-white grid place-items-center text-xl" aria-hidden="true">✚</span>
+      <span class="text-lg">امن‌شهر</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-6 text-sm font-bold text-gray-700" aria-label="منوی اصلی">
+      <a href="#academy" class="hover:text-navy-700">آموزش‌ها</a>
+      <a href="#audience" class="hover:text-navy-700">جامعه‌ی هدف</a>
+      <a href="#passive" class="hover:text-navy-700">مبحث ۲۱</a>
+      <a href="#info" class="hover:text-navy-700">پیشنهادها</a>
+    </nav>
+    <button id="menuBtn" class="md:hidden p-2 rounded border" aria-expanded="false" aria-controls="mobileNav" aria-label="باز کردن منو">☰</button>
+  </div>
+  <nav id="mobileNav" class="hidden md:hidden border-t px-4 py-2 font-bold text-sm" aria-label="منوی موبایل">
+    <a class="block py-2" href="#academy">آموزش‌ها</a>
+    <a class="block py-2" href="#audience">جامعه‌ی هدف</a>
+    <a class="block py-2" href="#passive">مبحث ۲۱</a>
+    <a class="block py-2" href="#info">پیشنهادها</a>
+  </nav>
+</header>
+
+<main id="app" class="flex-1 max-w-6xl w-full mx-auto px-4 py-8"></main>
+
+<footer class="bg-navy-900 text-white mt-12">
+  <div class="max-w-6xl mx-auto px-4 py-10 grid gap-6 md:grid-cols-3 text-sm leading-7">
+    <div>
+      <p class="font-extrabold text-base mb-2">امن‌شهر</p>
+      <p>پروژه‌ای آموزشی و مستقل. به هیچ سامانه‌ی اداری یا داخلی سازمان و شهرداری متصل نیست.</p>
+    </div>
+    <div>
+      <p class="font-bold mb-2">گزارش رسمی شهری</p>
+      <p>گزارش‌های رسمی شهری را از سامانه‌ی ۱۳۷ ثبت کنید.</p>
+    </div>
+    <div>
+      <p class="font-bold mb-2">یادداشت</p>
+      <p>این محتوا جایگزین دستورالعمل رسمی سازمان مدیریت بحران کشور نیست. آخرین به‌روزرسانی: ۱۴۰۵/۰۸/۱۳</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+const AUDIENCES = ['کودکان','نوجوانان','بزرگسالان','سالمندان'];
+
+const HAZARDS = [
+  { id:'earthquake', title:'زلزله', icon:'🏚️', color:'warn', desc:'پناه گرفتن هنگام لرزش، ایمن‌سازی خانه و برنامه‌ی پس از زلزله.' },
+  { id:'flood', title:'سیل و آب‌گرفتگی', icon:'🌊', color:'navy', desc:'خطر آب جاری، مسیرهای سیل‌زده و اقدام پیش از سیلاب.' },
+  { id:'fire', title:'آتش‌سوزی', icon:'🔥', color:'fire', desc:'پیشگیری، خروج از دود و استفاده‌ی ایمن از کپسول.' },
+  { id:'evacuation', title:'تخلیه‌ی ساختمان', icon:'🚪', color:'safe', desc:'مسیر فرار، نقطه‌ی تجمع و کمک به دیگران.' },
+  { id:'firstaid', title:'کمک‌های اولیه', icon:'⛑️', color:'safe', desc:'ارزیابی صحنه و مراقبت اولیه تا رسیدن امداد.' },
+  { id:'kit', title:'کیف بحران', icon:'🎒', color:'warn', desc:'تجهیزات لازم برای چند روز پس از بحران.' },
+  { id:'family', title:'برنامه‌ی خانوادگی', icon:'👨‍👩‍👧', color:'navy', desc:'نقش هر عضو خانواده، ارتباط و محل دیدار.' },
+  { id:'passive', title:'پدافند غیرعامل', icon:'🛡️', color:'navy', desc:'کاهش آسیب‌پذیری ساختمان‌ها و مردم.' },
+  { id:'workplace', title:'ایمنی در محیط کار', icon:'🏢', color:'safe', desc:'مسئولیت کارفرما و کارکنان در شرایط اضطراری.' },
+  { id:'vulnerable', title:'کودکان و سالمندان', icon:'🧒', color:'warn', desc:'نیازهای ویژه‌ی گروه‌های آسیب‌پذیر.' }
+];
+
+const LESSONS = [
+  { id:'eq-1', hazard:'earthquake', title:'پناه گرفتن درست هنگام زلزله', minutes:5, level:'مقدماتی', audiences:AUDIENCES,
+    summary:'در لحظه‌ی لرزش، بیشترین خطر از سقوط اشیا و فروریختن دیوارهای ضعیف است. رفتار آرام و از پیش تمرین‌شده جان را حفظ می‌کند.',
+    why:'بیشتر آسیب‌های زلزله در داخل ساختمان‌ها و از سقوط اشیا رخ می‌دهد، نه از فروریختن کامل ساختمان. داشتن یک روش ساده که همه بلدند، زمان واکنش را کم می‌کند.',
+    before:['برای هر اتاق یک محل امن شناسایی کنید: زیر میز محکم یا کنار ستون و دیوار باربر.','کمد، کتابخانه و تلویزیون را به دیوار ببندید و وسایل سنگین را پایین نگه دارید.','با خانواده تمرین کنید تا پناه گرفتن خودکار شود.'],
+    during:['خود را روی زمین بیندازید، زیر میز پناه بگیرید و سر و گردن را با دست بپوشانید (Drop، Cover، Hold On).','از پنجره، آینه، قفسه و وسایل آویزان فاصله بگیرید.','اگر در تخت هستید، همان‌جا بمانید و سر را با بالش بپوشانید.','در خیابان، از ساختمان‌ها، تیرهای برق و تابلوها دور شوید.','در خودرو توقف کنید و داخل آن بمانید؛ از پل و زیر تابلوهای بزرگ دوری کنید.'],
+    after:['لرزش تمام شد؟ آرام خارج شوید؛ از پله استفاده کنید، نه آسانسور.','اگر بوی گاز شنیدید، گاز را قطع کنید و فضا را تهویه کنید.','از ساختمان‌های آسیب‌دیده و پل‌های ترک‌خورده دور بمانید.','منتظر پیام‌های رسمی بمانید و از شبکه‌های شایعه‌ساز دوری کنید.'],
+    audienceNotes:{ 'کودکان':'با صدای بلند بگویید «زیر میز!». کودک را کنار خود نگه دارید و سرش را بپوشانید.', 'نوجوانان':'اگر در کلاس یا مدرسه هستید، از دستور معلم پیروی کنید و از راه‌پله‌ها بدون هجوم خارج شوید.', 'بزرگسالان':'بعد از لرزش، وضعیت اعضای خانواده و همسایگان را بررسی کنید.', 'سالمندان':'اگر نمی‌توانید خم شوید، روی صندلی محکم بنشینید، بازوها را روی سر بگذارید و از جای خود تکان نخورید.' },
+    sources:['Earthquake Country Alliance — Recommended Earthquake Safety Actions (Drop, Cover, Hold On)','پژوهشگاه بین‌المللی زلزله‌شناسی — توصیه‌های ایمنی قبل از زلزله','خبرگزاری مهر — دوره‌ی آمادگی در برابر زلزله (هلال‌احمر)'],
+    quiz:{ q:'هنگام لرزش در داخل ساختمان، بهترین اقدام کدام است؟', options:['دویدن به سمت راه‌پله','پناه گرفتن زیر میز محکم','ایستادن کنار پنجره'], answer:1 } },
+
+  { id:'eq-2', hazard:'earthquake', title:'ایمن‌سازی خانه برای زلزله', minutes:8, level:'مقدماتی', audiences:AUDIENCES,
+    summary:'بیشتر آسیب‌های داخل خانه از وسایل سنگین و مبلمان رها شده رخ می‌دهد. با چند اقدام ساده خطر را پیش از زلزله کم کنید.',
+    why:'وسایلی که به دیوار مهار نشده‌اند، می‌توانند روی افراد بیفتند یا مسیر خروج را ببندند. این کار کم‌هزینه است و اثر زیادی دارد.',
+    before:['کمدهای بلند، کتابخانه و یخچال را به دیوار مهار کنید.','وسایل سنگین را در قفسه‌های پایین بگذارید.','مسیرهای خروج را خالی از مانع نگه دارید.','شیرهای گاز و کنتور برق و آب را پیدا کنید و طرز قطع آن‌ها را به همه بیاموزید.','کیف بحران و دفترچه‌ی شماره‌های ضروری را در جای مشخص نگه دارید.'],
+    during:['این بخش مربوط به پیش از زلزله است؛ هنگام لرزش به درس «پناه گرفتن» مراجعه کنید.'],
+    after:['پس از زلزله، بررسی کنید آیا وسایل شکسته یا نشت گاز وجود دارد.','در خانه‌ی آسیب‌دیده وارد نشوید تا از ایمنی سازه مطمئن شوید.'],
+    audienceNotes:{ 'کودکان':'اتاق کودک را بدون وسایل آویزان و قفسه‌ی بلند نگه دارید.', 'نوجوانان':'مهار کمد یا قفسه‌ی اتاق خود را به‌عنوان کار خانگی انجام دهید.', 'بزرگسالان':'در بازدید سالانه‌ی خانه، این فهرست را مرور کنید.', 'سالمندان':'داروها و عینک را در کیفی کنار تخت نگه دارید و مسیر خروج از اتاق خواب را بدون مانع نگه دارید.' },
+    sources:['پژوهشگاه بین‌المللی زلزله‌شناسی — توصیه‌های ایمنی قبل از زلزله','پیوان — نکات ایمنی در برابر زمین‌لرزه'],
+    quiz:{ q:'کدام اقدام برای ایمن‌سازی خانه مناسب است؟', options:['مهار کمد بلند به دیوار','گذاشتن وسایل سنگین در قفسه‌ی بالا','بستن مسیر خروج با مبلمان'], answer:0 } },
+
+  { id:'fl-1', hazard:'flood', title:'خطر آب جاری و مسیرهای سیل‌زده', minutes:5, level:'مقدماتی', audiences:AUDIENCES,
+    summary:'آب جاری حتی با عمق کم می‌تواند فرد را زمین بزند و خودرو را شناور یا جابه‌جا کند. هرگز برای عبور از آن تلاش نکنید.',
+    why:'بسیاری از مرگ‌های سیل در خودروها رخ می‌دهد. عمق آب را نمی‌توان از ظاهر آن تشخیص داد و زیر آب ممکن است جاده فرسوده باشد.',
+    before:['از پیش‌بینی‌های هواشناسی و هشدارهای رسمی آگاه باشید.','اگر در منطقه‌ی سیل‌خیز زندگی می‌کنید، وسایل حیاتی را به طبقات بالا منتقل کنید.','مسیرهای تخلیه و نقاط مرتفع نزدیک را بشناسید.'],
+    during:['اگر جاده سیل‌زده است، سفر را لغو یا مسیر را تغییر دهید.','از موانع یا تابلوی «برنگردید، غرق نشوید» دور نزنید.','اگر آب وارد خودرو شد، خودرو را رها کنید و به ارتفاع بروید.','به پل‌ها، کانال‌ها و زیرگذرها نزدیک نشوید.'],
+    after:['حتی پس از فروکش کردن آب، زمین ممکن است ناپایدار باشد؛ احتیاط کنید.','برق و وسایل برقی را تا بررسی ایمنی روشن نکنید.'],
+    audienceNotes:{ 'کودکان':'به کودکان یاد دهید که نزدیک آب جاری بازی نکنند، حتی اگر کم‌عمق به نظر برسد.', 'نوجوانان':'اگر در مسیر مدرسه با آب جاری روبه‌رو شدید، برگردید و خبر دهید.', 'بزرگسالان':'اگر با خودرو سفر می‌کنید، از هشدارهای جاده‌ای آگاه باشید.', 'سالمندان':'اگر راه‌رفتن سخت است، پیش از بارش شدید به محلی مرتفع و مطمئن منتقل شوید.' },
+    sources:['U.S. National Weather Service — Turn Around, Don’t Drown','Ready.gov — Flood Safety'],
+    quiz:{ q:'اگر جاده‌ای با آب جاری مسدود است، چه باید کرد؟', options:['با احتیاط عبور کرد','مسیر را تغییر داد یا سفر را لغو کرد','از کنار تابلو عبور کرد'], answer:1 } },
+
+  { id:'fi-1', hazard:'fire', title:'خروج از ساختمان هنگام دود', minutes:4, level:'پایه', audiences:AUDIENCES,
+    summary:'دود بیشتر از آتش خطرناک است. در ارتفاع پایین حرکت کنید و از آسانسور استفاده نکنید.',
+    why:'دود غلیظ دید را می‌گیرد و هوای تنفسی را آلوده می‌کند. در بیشتر حادثه‌ها، مرگ به‌دلیل استنشاق دود رخ می‌دهد.',
+    before:['نقشه‌ی خروج ساختمان را بدانید و دو مسیر فرار را در نظر بگیرید.','کپسول آتش‌نشانی را در دسترس و طرز استفاده از آن را بیاموزید.'],
+    during:['با صدای بلند هشدار دهید و از پله‌ها خارج شوید.','نزدیک زمین حرکت کنید و دهان و بینی را با پارچه‌ی مرطوب بپوشانید.','اگر در بسته بود، به آن دست بزنید؛ اگر داغ بود، از آن نروید.'],
+    after:['به نقطه‌ی تجمع بروید و منتظر بمانید تا همه را بشمارند.'],
+    audienceNotes:{ 'کودکان':'با کودک تمرین کنید که در صورت دود، روی زمین بخزد و دنبال والدین برود.', 'نوجوانان':'در خوابگاه یا خانه، مسیر خروج را پیش از خواب در ذهن مرور کنید.', 'بزرگسالان':'کپسول را در جای قابل دسترس نگه دارید و سالی یک بار بازبینی کنید.', 'سالمندان':'اگر خروج سخت است، پیش از آتش‌سوزی به همسایه یا امدادگر خبر دهید تا کمک‌تان کنند.' },
+    sources:['منبع رسمی این درس در حال تأیید است.'],
+    quiz:{ q:'هنگام دود غلیظ، بهتر است:', options:['ایستاده راه بروید','نزدیک زمین حرکت کنید','با آسانسور پایین بروید'], answer:1 } },
+
+  { id:'fa-1', hazard:'firstaid', title:'ارزیابی صحنه و تماس با امداد', minutes:6, level:'پایه', audiences:AUDIENCES,
+    summary:'پیش از کمک به دیگران، ایمنی خود و صحنه را بررسی کنید. کمک بدون ایمنی ممکن است دو قربانی بسازد.',
+    why:'در بیشتر حادثه‌ها، تماس به‌موقع با اورژانس و کنترل خونریزی جان را نجات می‌دهد. اکثر شهروندان می‌توانند با آموزش کوتاه این کار را انجام دهند.',
+    before:['یک دوره‌ی کمک‌های اولیه‌ی پایه را بگذرانید.','جعبه‌ی کمک‌های اولیه را در خانه و خودرو داشته باشید.'],
+    during:['صحنه را از نظر خطر (ترافیک، آتش، برق) بررسی کنید.','فرد را صدا بزنید و تکان دهید. پاسخ نمی‌دهد؟ با ۱۱۵ تماس بگیرید.','خونریزی شدید را با فشار مستقیم و پارچه‌ی تمیز کنترل کنید.','تا رسیدن امداد، فرد را گرم نگه دارید و تنهایش نگذارید.'],
+    after:['اطلاعات حادثه را برای امدادگران بگویید: محل، تعداد مصدوم و وضعیت او.'],
+    audienceNotes:{ 'کودکان':'کودکان باید فقط تماس با ۱۱۵ و گفتن آدرس را بیاموزند، نه کمک فیزیکی.', 'نوجوانان':'آموزش کمک‌های اولیه می‌تواند بخشی از درس‌های مدرسه یا باشگاه باشد.', 'بزرگسالان':'هر چند سال یک بار مهارت خود را تمرین کنید.', 'سالمندان':'اگر به تنهایی هستید، اعضای خانواده یا همسایه را بیاگاهانید و شماره‌ی تماس را در تلفن ذخیره کنید.' },
+    sources:['خبرگزاری مهر — دوره‌ی آمادگی در برابر زلزله (هلال‌احمر)','منبع تکمیلی در حال تأیید است.'],
+    quiz:{ q:'قبل از کمک به مصدوم، نخست چه باید کرد؟', options:['جابه‌جایی فوری مصدوم','بررسی ایمنی صحنه','دادن آب به مصدوم'], answer:1 } },
+
+  { id:'kit-1', hazard:'kit', title:'ساخت کیف بحران خانواده', minutes:5, level:'مقدماتی', audiences:AUDIENCES,
+    summary:'کیف بحران مجموعه‌ای از اقلام آماده است که در ساعات و روزهای نخست بحران کمک می‌کند.',
+    why:'پس از بحران ممکن است برق، آب و خدمات قطع شوند. یک کیف آماده، تا رسیدن کمک‌ها زندگی را آسان‌تر می‌کند.',
+    before:['آب آشامیدنی و غذای کنسروی یا خشک برای چند روز.','داروهای ضروری خانواده و جعبه‌ی کمک‌های اولیه.','چراغ قوه، باتری اضافه، رادیو و پاوربانک.','کپی مدارک شناسایی در کیف ضدآب.','دفترچه‌ی شماره‌های ضروری و عکس اعضای خانواده (برای جست‌وجو).'],
+    during:['این بخش مربوط به پیش از بحران است؛ کیف را در جای قابل دسترس نگه دارید.'],
+    after:['هر شش ماه محتوای کیف را بررسی و مواد غذایی و داروهای منقضی را جایگزین کنید.'],
+    audienceNotes:{ 'کودکان':'یک عروسک یا کتاب کوچک در کیف کودک بگذارید تا آرام بماند.', 'نوجوانان':'کیف شخصی خود را با شارژر و هدفون بسته‌بندی کنید.', 'بزرگسالان':'کیف خانوادگی و کیف خودرو را جدا آماده کنید.', 'سالمندان':'داروها، عینک، باتری سمعک و فهرست داروها را در کیف قرار دهید.' },
+    sources:['روزنامه‌ی تایمز — نکات ایمنی قبل و بعد از زلزله','خبرگزاری مهر — توصیه‌های ایمنی برای کیف بحران'],
+    quiz:{ q:'کدام مورد جزو کیف بحران است؟', options:['لباس مهمانی','آب و غذای کنسروی برای چند روز','ظرف غذای گرم'], answer:1 } }
+];
+
+const FAQ = [
+  { q:'آیا این سایت جای دستورالعمل رسمی را می‌گیرد؟', a:'خیر. محتوا آموزشی و عمومی است. هشدارهای رسمی و دستورالعمل‌های دولتی اولویت دارند.' },
+  { q:'چرا بخش «چشم شهروند» فعال نیست؟', a:'راه‌اندازی آن نیازمند مجوز حراست شهرداری است و تا آن زمان فعال نمی‌شود.' },
+  { q:'منابع محتوا را از کجا می‌توانم ببینم؟', a:'زیر هر درس فهرست منابع آمده است. درس‌هایی که منبع تأییدشده ندارند، به‌صورت صریح اعلام شده‌اند.' }
+];
+
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hz = id => HAZARDS.find(h => h.id === id);
+const LESSON_BG = { navy:'bg-navy-100 text-navy-800', safe:'bg-safe-100 text-safe-800', fire:'bg-fire-50 text-fire-700', warn:'bg-warn-100 text-gray-800' };
+
+function hazardCard(h) {
+  return `<a href="#academy/${h.id}" class="card p-5 block">
+    <div class="flex items-center gap-3 mb-2"><span class="text-3xl" aria-hidden="true">${h.icon}</span><h3 class="font-extrabold">${esc(h.title)}</h3></div>
+    <p class="text-sm text-gray-600 leading-7">${esc(h.desc)}</p>
+    <p class="text-xs font-bold mt-3 text-navy-700">${LESSONS.filter(l => l.hazard === h.id).length ? LESSONS.filter(l => l.hazard === h.id).length + ' درس' : 'در حال تدوین'}</p></a>`;
+}
+
+function lessonCard(l) {
+  const h = hz(l.hazard);
+  return `<a href="#lesson/${l.id}" class="card p-5 block">
+    <span class="inline-block text-xs font-bold px-2 py-1 rounded ${LESSON_BG[h.color]}">${esc(h.title)}</span>
+    <h3 class="font-extrabold mt-3 mb-2 leading-7">${esc(l.title)}</h3>
+    <p class="text-sm text-gray-600 leading-7 mb-3">${esc(l.summary)}</p>
+    <div class="text-xs text-gray-500">${l.minutes} دقیقه · ${esc(l.level)}</div></a>`;
+}
+
+function home() {
+  return `
+  <section class="rounded-2xl bg-navy-800 text-white p-8 md:p-12 mb-10">
+    <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-4">آماده باشید، آسیب را کم کنید</h1>
+    <p class="text-navy-100 leading-8 max-w-2xl mb-8">آموزش عملی مدیریت بحران و پدافند غیرعامل برای همه‌ی اعضای خانواده، از کودک تا سالمند. با چهار گام ساده شروع کنید.</p>
+    <div class="grid gap-4 md:grid-cols-4">
+      ${[['۱','آگاه باشید','خطرات منطقه‌ی خود را بشناسید و هشدارهای رسمی را دنبال کنید.','#academy'],
+         ['۲','برنامه بریزید','برای خانواده محل دیدار و مسیر خروج تعیین کنید.','#academy/family'],
+         ['۳','کیف بسازید','کیف بحران را آماده و هر شش ماه بازبینی کنید.','#lesson/kit-1'],
+         ['۴','درگیر شوید','آموزش را به همسایگان و همکاران منتقل کنید.','#audience']].map(([n,t,d,h]) =>
+        `<a href="${h}" class="bg-white/10 hover:bg-white/20 rounded-xl p-5 block"><span class="inline-grid place-items-center w-9 h-9 rounded-full bg-warn-400 text-gray-900 font-extrabold mb-3">${n}</span><h2 class="font-extrabold mb-2">${t}</h2><p class="text-sm text-navy-100 leading-7">${d}</p></a>`).join('')}
+    </div>
+  </section>
+
+  <section id="audience" class="mb-12" aria-labelledby="aud">
+    <h2 id="aud" class="text-2xl font-extrabold mb-2">جامعه‌ی هدف</h2>
+    <p class="text-gray-600 mb-5">آموزش‌ها برای هر گروه سنی متفاوت توضیح داده شده‌اند. از کودکان خردسال و نوجوانان تا بزرگسالان و سالمندان.</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      ${AUDIENCES.map(a => `<a href="#academy?aud=${encodeURIComponent(a)}" class="card p-5 text-center font-extrabold text-navy-800">${esc(a)}</a>`).join('')}
+    </div>
+  </section>
+
+  <section class="mb-12" aria-labelledby="hz">
+    <h2 id="hz" class="text-2xl font-extrabold mb-5">حوزه‌های آموزشی</h2>
+    <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-5">${HAZARDS.map(hazardCard).join('')}</div>
+  </section>
+
+  <section class="mb-12" aria-labelledby="latest">
+    <div class="flex items-center justify-between mb-5">
+      <h2 id="latest" class="text-2xl font-extrabold">آموزش‌های منتشرشده</h2>
+      <a href="#academy" class="font-bold text-navy-700">همه‌ی آموزش‌ها ←</a>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">${LESSONS.slice(0,3).map(lessonCard).join('')}</div>
+  </section>
+
+  <section aria-labelledby="faq">
+    <h2 id="faq" class="text-2xl font-extrabold mb-4">پرسش‌های متداول</h2>
+    <div class="space-y-3">${FAQ.map(f => `<details class="card p-5"><summary class="font-bold cursor-pointer">${esc(f.q)}</summary><p class="mt-3 text-gray-600 leading-8">${esc(f.a)}</p></details>`).join('')}</div>
+  </section>`;
+}
+
+function academy(hazardId, aud) {
+  const h = hazardId ? hz(hazardId) : null;
+  let list = LESSONS.filter(l => (!h || l.hazard === h.id) && (!aud || l.audiences.includes(aud)));
+  return `
+  <h1 class="text-3xl font-extrabold mb-2">آموزش‌ها</h1>
+  <p class="text-gray-600 leading-8 mb-6">حوزه و گروه سنی موردنظر خود را انتخاب کنید.</p>
+  <div class="mb-4" role="group" aria-label="حوزه"><div class="flex flex-wrap gap-2">
+    <a class="chip" aria-pressed="${!h}" href="#academy">همه</a>
+    ${HAZARDS.map(x => `<a class="chip" aria-pressed="${h && h.id===x.id}" href="#academy/${x.id}">${x.icon} ${esc(x.title)}</a>`).join('')}
+  </div></div>
+  <div class="mb-6" role="group" aria-label="جامعه‌ی هدف"><div class="flex flex-wrap gap-2">
+    ${AUDIENCES.map(a => `<a class="chip" aria-pressed="${aud===a}" href="#academy${h?'/'+h.id:''}?aud=${encodeURIComponent(a)}">${esc(a)}</a>`).join('')}
+  </div></div>
+  <label class="block mb-6"><span class="sr-only">جست‌وجو</span>
+    <input id="search" type="search" placeholder="جست‌وجو در آموزش‌ها…" class="w-full md:w-96 border border-gray-300 rounded-lg px-4 py-3 bg-white outline-none focus:border-navy-600"></label>
+  ${h ? `<div class="card p-5 mb-8"><p class="font-extrabold mb-1">${h.icon} ${esc(h.title)}</p><p class="text-gray-600 leading-8">${esc(h.desc)}</p></div>` : ''}
+  <div id="lessonList" class="grid gap-4 md:grid-cols-2">
+    ${list.length ? list.map(lessonCard).join('') : '<p class="text-gray-500 md:col-span-2">برای این ترکیب هنوز آموزشی منتشر نشده است. این حوزه در حال تدوین است.</p>'}
+  </div>
+  <p id="noResult" class="hidden text-gray-500 mt-6">نتیجه‌ای یافت نشد.</p>`;
+}
+
+function lesson(id) {
+  const l = LESSONS.find(x => x.id === id);
+  if (!l) return notFound();
+  const h = hz(l.hazard);
+  const section = (title, items) => items && items.length ? `<section class="mb-8"><h2 class="text-xl font-extrabold mb-3">${title}</h2><ul class="space-y-2 leading-8 list-disc pr-6">${items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></section>` : '';
+  return `
+  <nav class="text-sm text-gray-500 mb-4" aria-label="مسیر صفحه"><a href="#academy" class="hover:text-navy-700">آموزش‌ها</a> ‹ <a href="#academy/${h.id}" class="hover:text-navy-700">${esc(h.title)}</a></nav>
+  <article class="max-w-3xl">
+    <h1 class="text-3xl font-extrabold mb-3 leading-tight">${esc(l.title)}</h1>
+    <p class="text-lg text-gray-700 leading-9 mb-4">${esc(l.summary)}</p>
+    <div class="flex flex-wrap gap-4 text-sm text-gray-500 mb-8"><span>⏱ ${l.minutes} دقیقه</span><span>📶 ${esc(l.level)}</span><span>👥 ${l.audiences.map(esc).join('، ')}</span></div>
+
+    <section class="rounded-lg bg-navy-50 border-r-4 border-navy-700 p-5 mb-8"><h2 class="font-extrabold mb-2">چرا مهم است؟</h2><p class="leading-8">${esc(l.why)}</p></section>
+    ${section('قبل از بحران', l.before)}
+    ${section('هنگام بحران', l.during)}
+    ${section('پس از بحران', l.after)}
+
+    <section class="mb-8" aria-labelledby="aud-h"><h2 id="aud-h" class="text-xl font-extrabold mb-3">راهنمای ویژه‌ی هر گروه سنی</h2>
+      <div class="grid gap-3 md:grid-cols-2">${AUDIENCES.map(a => `<div class="card p-4"><p class="font-extrabold text-navy-800 mb-1">${esc(a)}</p><p class="text-sm leading-7 text-gray-700">${esc(l.audienceNotes[a] || '')}</p></div>`).join('')}</div>
+    </section>
+
+    <section class="card p-6 mb-8" aria-labelledby="qz"><h2 id="qz" class="text-xl font-extrabold mb-4">آزمون کوتاه</h2>
+      <p class="font-bold mb-4">${esc(l.quiz.q)}</p>
+      <div id="quizOpts" class="space-y-2">${l.quiz.options.map((o,i) => `<button data-i="${i}" class="w-full text-right border border-gray-300 rounded-lg px-4 py-3 hover:border-navy-600">${esc(o)}</button>`).join('')}</div>
+      <p id="quizMsg" class="mt-4 font-bold" aria-live="polite"></p>
+    </section>
+
+    <section class="card p-5 text-sm leading-7" aria-labelledby="src"><h2 id="src" class="font-extrabold mb-2">منابع</h2><ul class="list-disc pr-5">${l.sources.map(s => `<li>${esc(s)}</li>`).join('')}</ul></section>
+    <p class="mt-6 text-sm text-gray-500">این محتوا آموزشی است. در شرایط اضطراری ابتدا با ۱۱۵ (اورژانس) یا ۱۲۵ (آتش‌نشانی) تماس بگیرید.</p>
+  </article>`;
+}
+
+function passive() {
+  const items = [
+    ['تعریف و هدف','پدافند غیرعامل مجموعه‌ی اقدامات غیرمسلحانه‌ای است که بازدارندگی را افزایش می‌دهد، آسیب‌پذیری را کم می‌کند، تداوم کارهای ضروری را تضمین می‌کند و مدیریت بحران را آسان‌تر می‌سازد.'],
+    ['دامنه‌ی کاربرد','ساختمان‌ها بر اساس کاربری، تعداد ساکنان، تعداد طبقات و ارزش سرمایه‌ی داخل آن گروه‌بندی می‌شوند و الزامات بر همان اساس تعیین می‌شود.'],
+    ['معماری و محوطه','نمای ساده و صاف با فرم محدب، کاهش سطح شیشه و بازشوها، بازشدن درهای خروجی و پنجره‌ها به سمت بیرون، و اتصال قاب درها به سازه.'],
+    ['بارهای انفجاری','برای تعیین بارهای انفجاری در طراحی سازه‌های مقاوم، ضوابط مبحث ششم (بارهای وارد بر ساختمان) مرجع است.'],
+    ['تأسیسات برقی و مکانیکی','ملاحظات پدافند غیرعامل برای تأسیسات برقی و مکانیکی نیز در مبحث آمده و باید در طراحی لحاظ شود.']
+  ];
+  return `
+  <h1 class="text-3xl font-extrabold mb-3">مبحث ۲۱ مقررات ملی ساختمان: پدافند غیرعامل</h1>
+  <p class="text-gray-600 leading-8 max-w-3xl mb-6">چکیده‌ای برای آگاهی عمومی. این متن جایگزین متن رسمی مبحث نیست و برای طراحی یا اجرا نباید به‌تنهایی استفاده شود.</p>
+  <div class="rounded-lg bg-warn-100 border-r-4 border-warn-500 p-5 mb-8 text-sm leading-7"><strong>نکته‌ی ویرایش:</strong> ملاک این چکیده ویرایش دوم (۱۳۹۵) است. برخی سایت‌ها ویرایش جدیدتری ذکر می‌کنند، اما نسخه‌ی رسمی آن در این بررسی تأیید نشد. پیش از استفاده‌ی حرفه‌ای، متن رسمی را از دفتر مقررات ملی ساختمان دریافت کنید.</div>
+  <div class="grid gap-4 md:grid-cols-2 mb-10">${items.map(([t,d]) => `<section class="card p-5"><h2 class="font-extrabold mb-2">${esc(t)}</h2><p class="text-sm leading-7 text-gray-700">${esc(d)}</p></section>`).join('')}</div>
+  <section class="card p-5 text-sm leading-7" aria-labelledby="psrc"><h2 id="psrc" class="font-extrabold mb-2">منابع</h2><ul class="list-disc pr-5">
+    <li>مبحث ۲۱ مقررات ملی ساختمان (پدافند غیرعامل)، ویرایش ۱۳۹۵؛ بررسی از طریق منابع ثانویه (khanehomran.com، atnasr.ir)</li>
+    <li>جهان معماری — معرفی مبحث بیست‌ویکم (jahanememari.ir)</li>
+    <li>کلیدواژه — ملاحظات معماری و محوطه بر اساس ضوابط پدافند غیرعامل (kelidvajeh.ir)</li>
+    <li>مبحث ششم مقررات ملی ساختمان (بارهای وارد بر ساختمان)، با ارجاع از مبحث ۲۱</li>
+  </ul></section>`;
+}
+
+function info() {
+  const recs = [
+    ['تمرین پناه گرفتن زیر میز را در خانه و با خانواده منظم تکرار کنید.','Earthquake Country Alliance'],
+    ['برای هر اتاق یک محل امن مشخص کنید تا در لحظه‌ی زلزله وقت تلف نشود.','Earthquake Country Alliance'],
+    ['کنتور آب، برق و گاز را به همه‌ی اعضای خانواده نشان دهید و طرز قطع آن‌ها را یاد بدهید.','پژوهشگاه بین‌المللی زلزله‌شناسی'],
+    ['کیف بحران شامل مدارک، داروها و جعبه‌ی کمک‌های اولیه را آماده داشته باشید.','خبرگزاری مهر'],
+    ['در مسیر سیل، سفر را لغو یا تغییر دهید و از موانع «برنگردید، غرق نشوید» عبور نکنید.','NWS و Ready.gov'],
+    ['کمک‌های اولیه را یاد بگیرید؛ پس از زلزله‌ی بزرگ مراکز درمانی شلوغ می‌شوند.','خبرگزاری مهر (هلال‌احمر)'],
+    ['هشدارهای چندخطری و اطلاعات ریسک را برای همه‌ی مردم، از جمله گروه‌های آسیب‌پذیر، در دسترس قرار دهید.','UNDRR، چارچوب سندای ۲۰۱۵–۲۰۳۰ (هدف G)']
+  ];
+  return `
+  <h1 class="text-3xl font-extrabold mb-3">پیشنهادهای آمادگی</h1>
+  <p class="text-gray-600 leading-8 mb-8">توصیه‌های عمومی و قابل اجرا، با ذکر منبع.</p>
+  <ul class="grid gap-3 md:grid-cols-2 text-sm leading-7">
+    ${recs.map(([t,s]) => `<li class="card p-4"><span class="font-bold">${esc(t)}</span><span class="block text-xs text-gray-500 mt-2">منبع: ${esc(s)}</span></li>`).join('')}
+  </ul>
+  <h2 class="text-xl font-extrabold mt-12 mb-4">گام‌های بعدی توسعه</h2>
+  <ol class="space-y-3 text-sm leading-7">
+    <li class="card p-4">بررسی متن رسمی مبحث ۲۱ (ویرایش فعلی) از دفتر مقررات ملی ساختمان و تطبیق چکیده‌ی این سایت با آن.</li>
+    <li class="card p-4">تکمیل منابع رسمی برای درس‌های آتش‌سوزی، کمک‌های اولیه و کیف بحران، و تطبیق با دستورالعمل‌های سازمان مدیریت بحران کشور.</li>
+  </ol>`;
+}
+
+function disabled(title) {
+  return `<div class="max-w-2xl mx-auto text-center py-16"><p class="text-5xl mb-4" aria-hidden="true">🔒</p><h1 class="text-2xl font-extrabold mb-3">${esc(title)} فعلاً غیرفعال است</h1><p class="text-gray-600 leading-8">راه‌اندازی این بخش نیازمند مجوز حراست شهرداری است.</p><a href="#home" class="inline-block mt-6 font-bold text-navy-700">بازگشت به خانه</a></div>`;
+}
+
+function notFound() {
+  return `<div class="text-center py-20"><h1 class="text-2xl font-extrabold mb-2">صفحه پیدا نشد</h1><a href="#home" class="font-bold text-navy-700">بازگشت به خانه</a></div>`;
+}
+
+function render() {
+  const raw = location.hash.slice(1) || 'home';
+  const [pathPart, query=''] = raw.split('?');
+  const [route, arg] = pathPart.split('/');
+  const aud = new URLSearchParams(query).get('aud');
+  let html;
+  switch (route) {
+    case 'home': html = home(); break;
+    case 'academy': html = academy(arg, aud); break;
+    case 'lesson': html = lesson(arg); break;
+    case 'passive': html = passive(); break;
+    case 'info': html = info(); break;
+    case 'audience': html = home(); break;
+    case 'citizen': html = disabled('سامانه‌ی چشم شهروند'); break;
+    default: html = notFound();
+  }
+  $('#app').innerHTML = html;
+  const l = route === 'lesson' && LESSONS.find(x => x.id === arg);
+  document.title = (l ? l.title + ' | ' : '') + 'امن‌شهر';
+  window.scrollTo({ top: 0, behavior: 'auto' });
+  bindPage();
+  $('#mobileNav').classList.add('hidden');
+  $('#menuBtn').setAttribute('aria-expanded', 'false');
+}
+
+function bindPage() {
+  const search = $('#search');
+  if (search) search.addEventListener('input', e => {
+    const q = e.target.value.trim();
+    let shown = 0;
+    $('#lessonList').querySelectorAll('a').forEach(a => {
+      const ok = !q || a.textContent.includes(q);
+      a.classList.toggle('hidden', !ok);
+      if (ok) shown++;
+    });
+    $('#noResult').classList.toggle('hidden', shown > 0);
+  });
+  const opts = $('#quizOpts');
+  if (opts) {
+    const lesson = LESSONS.find(x => x.id === location.hash.split('/')[1]);
+    opts.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b || b.disabled) return;
+      const ok = Number(b.dataset.i) === lesson.quiz.answer;
+      opts.querySelectorAll('button').forEach((x, i) => {
+        x.disabled = true;
+        if (i === lesson.quiz.answer) { x.classList.add('border-safe-600','bg-safe-50'); }
+      });
+      if (!ok) b.classList.add('border-fire-600','bg-fire-50');
+      const msg = $('#quizMsg');
+      msg.textContent = ok ? 'پاسخ درست است.' : 'پاسخ نادرست بود. پاسخ درست مشخص شد.';
+      msg.className = 'mt-4 font-bold ' + (ok ? 'text-safe-700' : 'text-fire-700');
+    });
+  }
+}
+
+$('#menuBtn').addEventListener('click', () => {
+  const nav = $('#mobileNav');
+  const open = nav.classList.toggle('hidden') === false;
+  $('#menuBtn').setAttribute('aria-expanded', String(open));
+});
+window.addEventListener('hashchange', render);
+render();
+</script>
+</body>
+</html>
