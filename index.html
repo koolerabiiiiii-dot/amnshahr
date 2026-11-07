@@ -3894,7 +3894,79 @@ $('#menuBtn').addEventListener('click', () => {
   $('#menuBtn').setAttribute('aria-expanded', String(open));
 });
 window.addEventListener('hashchange', render);
+/* ---------- هر بار از اول باز شود ---------- */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+function startFresh() {
+  if (location.hash && location.hash !== '#home') {
+    history.replaceState(null, '', location.pathname + location.search + '#home');
+  }
+  window.scrollTo(0, 0);
+}
+startFresh();
+window.addEventListener('load', () => window.scrollTo(0, 0));
+window.addEventListener('pageshow', (e) => { if (e.persisted) { startFresh(); render(); } });
 render();
+
+/* ---------- نصب اپلیکیشن (PWA) ---------- */
+const INSTALL_KEY = 'amnshahr-install-dismissed';
+const INSTALL_TEXT = {
+  fa: { t: 'امن‌شهر را روی گوشی یا سیستم خود نصب کنید تا بدون اینترنت هم در دسترس باشد.', yes: 'نصب', later: 'بعداً', ios: 'برای نصب در آیفون: دکمه‌ی اشتراک‌گذاری را بزنید و «افزودن به صفحه‌ی اصلی» را انتخاب کنید.' },
+  en: { t: 'Install Amnshahr on your phone or computer to use it offline.', yes: 'Install', later: 'Later', ios: 'To install on iPhone: tap the Share button and choose "Add to Home Screen".' },
+  ar: { t: 'ثبّت امن‌شهر على هاتفك أو حاسوبك لاستخدامه دون إنترنت.', yes: 'تثبيت', later: 'لاحقاً', ios: 'للتثبيت على iPhone: اضغط زر المشاركة واختر «إضافة إلى الشاشة الرئيسية».' }
+};
+let deferredInstall = null;
+
+function isStandaloneApp() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function installDismissedRecently() {
+  try { return Date.now() - (+localStorage.getItem(INSTALL_KEY) || 0) < 7 * 864e5; } catch (e) { return false; }
+}
+
+function hideInstallBox() { const b = document.getElementById('installBox'); if (b) b.hidden = true; }
+
+function dismissInstallBox() {
+  try { localStorage.setItem(INSTALL_KEY, String(Date.now())); } catch (e) {}
+  hideInstallBox();
+}
+
+function showInstallBox(mode) {
+  if (isStandaloneApp() || installDismissedRecently()) return;
+  const T = INSTALL_TEXT[LANG] || INSTALL_TEXT.fa;
+  let box = document.getElementById('installBox');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'installBox';
+    box.className = 'fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-96 card p-4 z-50 shadow-lg';
+    document.body.appendChild(box);
+  }
+  box.innerHTML = `<p class="font-bold leading-7 mb-3">${esc(T.t)}</p>` +
+    (mode === 'prompt'
+      ? `<div class="flex gap-2"><button id="installYes" type="button" class="rounded-xl bg-navy-700 text-white font-bold px-4 py-2">${esc(T.yes)}</button><button id="installNo" type="button" class="rounded-xl border border-gray-500 text-gray-900 bg-white font-bold px-4 py-2">${esc(T.later)}</button></div>`
+      : `<p class="text-sm leading-7 mb-3">${esc(T.ios)}</p><button id="installNo" type="button" class="rounded-xl border border-gray-500 text-gray-900 bg-white font-bold px-4 py-2">${esc(T.later)}</button>`);
+  box.hidden = false;
+  document.getElementById('installNo').addEventListener('click', dismissInstallBox);
+  const yes = document.getElementById('installYes');
+  if (yes) yes.addEventListener('click', async () => {
+    if (!deferredInstall) return;
+    deferredInstall.prompt();
+    const choice = await deferredInstall.userChoice;
+    deferredInstall = null;
+    if (choice.outcome === 'accepted') hideInstallBox(); else dismissInstallBox();
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstall = e;
+  showInstallBox('prompt');
+});
+window.addEventListener('appinstalled', () => { deferredInstall = null; hideInstallBox(); });
+
+const isIOSDevice = /iphone|ipad|ipod/i.test(navigator.userAgent);
+if (isIOSDevice) setTimeout(() => showInstallBox('ios'), 3000);
+
 
 /* ---------- دسترس‌پذیری ---------- */
 const A11Y_KEY = 'amnshahr-a11y';
@@ -3931,5 +4003,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<script data-goatcounter="https://amnshahr-mohsen.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
