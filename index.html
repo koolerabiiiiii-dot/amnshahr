@@ -4020,5 +4020,79 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <script data-goatcounter="https://amnshahr-mohsen.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <!-- بخش نصب امن شهر -->
+<section id="amnshahr-install" dir="rtl" style="
+  max-width:500px;
+  margin:25px auto;
+  padding:22px;
+  background:#eef5f1;
+  border-radius:18px;
+  text-align:center;
+  font-family:Tahoma,sans-serif;
+  color:#183b34;
+  line-height:2;
+">
+  <h2>📱 نصب و استفاده از امن‌شهر</h2>
+
+  <div id="android-install" hidden>
+    <p>اگر گوشی شما اندروید است، برای نصب امن‌شهر دکمه زیر را بزنید.</p>
+    <button id="install-app" style="
+      background:#16734f;color:white;border:0;
+      border-radius:12px;padding:14px 25px;
+      font-size:17px;cursor:pointer;width:100%;
+    ">نصب برنامه امن‌شهر</button>
+    <p id="android-message"></p>
+  </div>
+
+  <div id="ios-guide" hidden>
+    <p>اگر آیفون دارید، می‌توانید امن‌شهر را به صفحه اصلی گوشی اضافه کنید.</p>
+    <p>
+      ۱. سایت را در Safari باز کنید.<br>
+      ۲. دکمه Share را بزنید.<br>
+      ۳. گزینه Add to Home Screen را انتخاب کنید.<br>
+      ۴. روی Add بزنید.
+    </p>
+    <p>برای استفاده آفلاین، ابتدا صفحات موردنیاز را با اینترنت باز کنید.</p>
+  </div>
+</section>
+
+<script>
+(function () {
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  const androidBox = document.getElementById("android-install");
+  const iosBox = document.getElementById("ios-guide");
+
+  if (isIOS) {
+    iosBox.hidden = false;
+  } else {
+    androidBox.hidden = false;
+  }
+
+  let installEvent = null;
+
+  window.addEventListener("beforeinstallprompt", function(event) {
+    event.preventDefault();
+    installEvent = event;
+  });
+
+  document.getElementById("install-app").addEventListener("click", async function() {
+    const message = document.getElementById("android-message");
+
+    if (installEvent) {
+      installEvent.prompt();
+      const result = await installEvent.userChoice;
+      message.textContent = result.outcome === "accepted"
+        ? "درخواست نصب پذیرفته شد."
+        : "نصب لغو شد.";
+      installEvent = null;
+    } else {
+      message.textContent =
+        "برای نصب، از منوی Chrome گزینه Install app را انتخاب کنید.";
+    }
+  });
+})();
+</script>
 </body>
 </html>
