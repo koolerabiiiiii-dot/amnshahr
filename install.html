@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#123b35">
   <title>نصب برنامه امن‌شهر</title>
+
   <style>
     body {
       margin: 0;
@@ -22,13 +23,13 @@
       background: white;
       width: 85%;
       max-width: 420px;
-      padding: 30px 20px;
+      padding: 28px 20px;
       border-radius: 22px;
       box-shadow: 0 8px 30px #00000015;
     }
     h1 { font-size: 25px; }
     p { line-height: 2; }
-    button {
+    button, a {
       display: block;
       width: 100%;
       box-sizing: border-box;
@@ -36,61 +37,105 @@
       margin-top: 14px;
       border: 0;
       border-radius: 12px;
-      font-size: 17px;
-      cursor: pointer;
+      font-size: 16px;
+      text-decoration: none;
     }
-    #install { background: #16734f; color: white; }
-    #cancel { background: #e9efec; color: #183b34; }
-    #message { color: #555; font-size: 14px; }
+    #install {
+      background: #16734f;
+      color: white;
+    }
+    #cancel {
+      background: #e9efec;
+      color: #183b34;
+    }
+    .guide {
+      display: none;
+      background: #f0f6f3;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 18px;
+      text-align: right;
+    }
+    .guide p { margin: 7px 0; }
+    .home {
+      color: #16734f;
+    }
   </style>
 </head>
+
 <body>
   <main class="card">
     <div style="font-size:55px">🏙️</div>
     <h1>امن‌شهر</h1>
-    <p><strong>آیا می‌خواهید برنامه امن‌شهر روی گوشی‌تان نصب شود؟</strong></p>
-    <p id="message">برای نصب، دکمه سبز را بزنید.</p>
-    <button id="install">بله، نصب برنامه</button>
-    <button id="cancel">خیر، فعلاً نه</button>
+
+    <p>
+      <strong>
+        آیا می‌خواهید برنامه امن‌شهر روی گوشی‌تان نصب شود؟
+      </strong>
+    </p>
+
+    <div id="android">
+      <button id="install">بله، نصب برنامه</button>
+    </div>
+
+    <div id="iphone" class="guide">
+      <strong>راهنمای نصب امن‌شهر در آیفون</strong>
+      <p>۱. این صفحه را در مرورگر Safari باز کنید.</p>
+      <p>۲. دکمه Share (مربع با فلش رو به بالا) را بزنید.</p>
+      <p>۳. گزینه Add to Home Screen را انتخاب کنید.</p>
+      <p>۴. در پایان روی Add بزنید.</p>
+      <p>حالا آیکون امن‌شهر روی صفحه گوشی شما قرار می‌گیرد.</p>
+    </div>
+
+    <button id="cancel">فعلاً نه</button>
+
+    <a class="home" href="./">
+      ورود به وب‌سایت امن‌شهر
+    </a>
   </main>
 
   <script>
     let installPrompt = null;
 
-    const installButton = document.getElementById("install");
-    const message = document.getElementById("message");
+    const isIOS = /iphone|ipad|ipod/i.test(
+      navigator.userAgent
+    );
+
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      navigator.standalone === true;
+
+    if (isIOS) {
+      document.getElementById("android").style.display = "none";
+
+      if (isStandalone) {
+        document.getElementById("iphone").style.display = "block";
+        document.getElementById("iphone").innerHTML =
+          "<strong>امن‌شهر روی گوشی شما نصب شده است.</strong>";
+      } else {
+        document.getElementById("iphone").style.display = "block";
+      }
+    }
 
     window.addEventListener("beforeinstallprompt", (event) => {
       event.preventDefault();
       installPrompt = event;
     });
 
-    installButton.addEventListener("click", async () => {
+    document.getElementById("install").addEventListener("click", async () => {
       if (installPrompt) {
-        installButton.disabled = true;
         installPrompt.prompt();
-
         const result = await installPrompt.userChoice;
         installPrompt = null;
-        installButton.disabled = false;
-
-        if (result.outcome === "accepted") {
-          message.textContent = "درخواست نصب پذیرفته شد.";
-        } else {
-          message.textContent = "نصب لغو شد. هر زمان خواستید دوباره تلاش کنید.";
-        }
       } else {
-        message.textContent =
-          "مرورگر در حال حاضر درخواست نصب مستقیم را ارائه نکرده است. لطفاً سایت اصلی را در Chrome باز کنید و از منوی مرورگر گزینه Install app را انتخاب کنید.";
+        alert(
+          "برای نصب، سایت اصلی امن‌شهر را در Chrome باز کنید و از منوی مرورگر گزینه Install app را انتخاب کنید."
+        );
       }
     });
 
     document.getElementById("cancel").addEventListener("click", () => {
       window.location.href = "./";
-    });
-
-    window.addEventListener("appinstalled", () => {
-      message.textContent = "برنامه امن‌شهر با موفقیت نصب شد.";
     });
   </script>
 </body>
