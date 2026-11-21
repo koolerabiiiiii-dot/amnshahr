@@ -1,18 +1,33 @@
+
 {
+  "id": "./",
   "name": "امن‌شهر | آموزش مدیریت بحران و پدافند غیرعامل",
   "short_name": "امن‌شهر",
-  "description": "آموزش آمادگی در برابر زلزله، سیل، آتش‌سوزی و تخلیه‌ی ساختمان، با بازی و راهنمای جامع.",
+  "description": "آموزش آمادگی در برابر بحران، سیل، زلزله، آتش‌سوزی و راهنمای جامع مدیریت بحران",
   "lang": "fa",
   "dir": "rtl",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F5F7FA",
-  "theme_color": "#0B3D68",
+  "theme_color": "#0D3B68",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "./icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
