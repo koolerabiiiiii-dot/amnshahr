@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -27,7 +28,7 @@
     }
     h1 { font-size: 25px; }
     p { line-height: 2; }
-    button, a {
+    button {
       display: block;
       width: 100%;
       box-sizing: border-box;
@@ -36,13 +37,11 @@
       border: 0;
       border-radius: 12px;
       font-size: 17px;
-      text-decoration: none;
       cursor: pointer;
     }
     #install { background: #16734f; color: white; }
     #cancel { background: #e9efec; color: #183b34; }
-    #home { color: #16734f; }
-    #help { font-size: 14px; color: #555; }
+    #message { color: #555; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -50,19 +49,16 @@
     <div style="font-size:55px">🏙️</div>
     <h1>امن‌شهر</h1>
     <p><strong>آیا می‌خواهید برنامه امن‌شهر روی گوشی‌تان نصب شود؟</strong></p>
-    <p id="help">با نصب برنامه، می‌توانید آن را مانند یک برنامه معمولی از صفحه گوشی باز کنید.</p>
-
+    <p id="message">برای نصب، دکمه سبز را بزنید.</p>
     <button id="install">بله، نصب برنامه</button>
     <button id="cancel">خیر، فعلاً نه</button>
-    <a id="home" href="./">ورود به وب‌سایت امن‌شهر</a>
   </main>
 
   <script>
     let installPrompt = null;
-    const installButton = document.getElementById("install");
-    const help = document.getElementById("help");
 
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const installButton = document.getElementById("install");
+    const message = document.getElementById("message");
 
     window.addEventListener("beforeinstallprompt", (event) => {
       event.preventDefault();
@@ -70,24 +66,31 @@
     });
 
     installButton.addEventListener("click", async () => {
-      if (isIOS) {
-        help.textContent =
-          "برای نصب در آیفون: در مرورگر Safari دکمه Share را بزنید و سپس Add to Home Screen را انتخاب کنید.";
-        return;
-      }
-
       if (installPrompt) {
+        installButton.disabled = true;
         installPrompt.prompt();
-        await installPrompt.userChoice;
+
+        const result = await installPrompt.userChoice;
         installPrompt = null;
+        installButton.disabled = false;
+
+        if (result.outcome === "accepted") {
+          message.textContent = "درخواست نصب پذیرفته شد.";
+        } else {
+          message.textContent = "نصب لغو شد. هر زمان خواستید دوباره تلاش کنید.";
+        }
       } else {
-        help.textContent =
-          "اگر گزینه نصب نمایش داده نشد، در Chrome منوی سه‌نقطه را باز کنید و گزینه Install app یا Add to Home screen را انتخاب کنید.";
+        message.textContent =
+          "مرورگر در حال حاضر درخواست نصب مستقیم را ارائه نکرده است. لطفاً سایت اصلی را در Chrome باز کنید و از منوی مرورگر گزینه Install app را انتخاب کنید.";
       }
     });
 
     document.getElementById("cancel").addEventListener("click", () => {
       window.location.href = "./";
+    });
+
+    window.addEventListener("appinstalled", () => {
+      message.textContent = "برنامه امن‌شهر با موفقیت نصب شد.";
     });
   </script>
 </body>
