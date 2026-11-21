@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123b35">
+  <title>نصب برنامه امن‌شهر</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eef4f1;
+      font-family: Tahoma, sans-serif;
+      text-align: center;
+      color: #183b34;
+    }
+    .card {
+      background: white;
+      width: 85%;
+      max-width: 420px;
+      padding: 30px 20px;
+      border-radius: 22px;
+      box-shadow: 0 8px 30px #00000015;
+    }
+    h1 { font-size: 25px; }
+    p { line-height: 2; }
+    button, a {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 15px;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 12px;
+      font-size: 17px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    #install { background: #16734f; color: white; }
+    #cancel { background: #e9efec; color: #183b34; }
+    #home { color: #16734f; }
+    #help { font-size: 14px; color: #555; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div style="font-size:55px">🏙️</div>
+    <h1>امن‌شهر</h1>
+    <p><strong>آیا می‌خواهید برنامه امن‌شهر روی گوشی‌تان نصب شود؟</strong></p>
+    <p id="help">با نصب برنامه، می‌توانید آن را مانند یک برنامه معمولی از صفحه گوشی باز کنید.</p>
+
+    <button id="install">بله، نصب برنامه</button>
+    <button id="cancel">خیر، فعلاً نه</button>
+    <a id="home" href="./">ورود به وب‌سایت امن‌شهر</a>
+  </main>
+
+  <script>
+    let installPrompt = null;
+    const installButton = document.getElementById("install");
+    const help = document.getElementById("help");
+
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      installPrompt = event;
+    });
+
+    installButton.addEventListener("click", async () => {
+      if (isIOS) {
+        help.textContent =
+          "برای نصب در آیفون: در مرورگر Safari دکمه Share را بزنید و سپس Add to Home Screen را انتخاب کنید.";
+        return;
+      }
+
+      if (installPrompt) {
+        installPrompt.prompt();
+        await installPrompt.userChoice;
+        installPrompt = null;
+      } else {
+        help.textContent =
+          "اگر گزینه نصب نمایش داده نشد، در Chrome منوی سه‌نقطه را باز کنید و گزینه Install app یا Add to Home screen را انتخاب کنید.";
+      }
+    });
+
+    document.getElementById("cancel").addEventListener("click", () => {
+      window.location.href = "./";
+    });
+  </script>
+</body>
+</html>
